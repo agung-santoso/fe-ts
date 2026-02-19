@@ -1,38 +1,25 @@
 // ============================================================================
 // TYPESCRIPT CONVERSION EXERCISE - E-Commerce Shopping Cart System
 // ============================================================================
-// Your Task: Convert this JavaScript code to TypeScript with proper types
-// Enable strict mode in tsconfig.json and fix all type errors
+// Converted to TypeScript with proper types, enums, interfaces, and type guards
 // ============================================================================
 
 // ============================================================================
 // SHOPPING CART SYSTEM
 // ============================================================================
 
-/*
- * Business Requirements:
- * - Manage a shopping cart with products
- * - Calculate totals with discounts and tax
- * - Handle different product types (physical, digital)
- * - Track order status through different stages
- * - Validate user permissions for admin operations
- * 
- * Your Goal:
- * 1. Add proper TypeScript types for all functions, objects, and variables
- * 2. Create type aliases or interfaces where appropriate
- * 3. Use enums for order status and product types
- * 4. Add type guards for validation functions
- * 5. Handle null/undefined cases properly
- * 6. Use union types and literal types where needed
- * 7. Make the code compile with strict mode enabled
- */
+// ============================================================================
+// ENUMS
+// ============================================================================
 
 // Product categories
 const ProductCategory = {
   PHYSICAL: "PHYSICAL",
   DIGITAL: "DIGITAL",
   SUBSCRIPTION: "SUBSCRIPTION"
-};
+} as const;
+
+type ProductCategoryValue = typeof ProductCategory[keyof typeof ProductCategory];
 
 // Order status workflow
 const OrderStatus = {
@@ -41,17 +28,91 @@ const OrderStatus = {
   SHIPPED: "SHIPPED",
   DELIVERED: "DELIVERED",
   CANCELLED: "CANCELLED"
-};
+} as const;
+
+type OrderStatusValue = typeof OrderStatus[keyof typeof OrderStatus];
 
 // User roles
 const UserRole = {
   CUSTOMER: "CUSTOMER",
   ADMIN: "ADMIN",
   MODERATOR: "MODERATOR"
-};
+} as const;
+
+type UserRoleValue = typeof UserRole[keyof typeof UserRole];
+
+// ============================================================================
+// TYPE / INTERFACE DEFINITIONS
+// ============================================================================
+
+type DiscountType = "PERCENTAGE" | "FIXED" | null;
+
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+  category: ProductCategoryValue;
+  stock: number;
+  downloadUrl: string | null;
+  createdAt: Date;
+}
+
+interface CartItem {
+  productId: number;
+  name: string;
+  price: number;
+  quantity: number;
+  category: ProductCategoryValue;
+}
+
+interface Cart {
+  userId: number;
+  items: CartItem[];
+  createdAt: Date;
+  lastModified: Date;
+}
+
+interface User {
+  id: number;
+  username: string;
+  email: string;
+  role: UserRoleValue;
+  isActive: boolean;
+  cart: CartItem[];
+}
+
+interface Order {
+  id: string;
+  userId: number;
+  items: CartItem[];
+  subtotal: number;
+  total: number;
+  status: OrderStatusValue;
+  shippingAddress: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface OrderSummary {
+  orderId: string;
+  status: OrderStatusValue;
+  itemCount: number;
+  total: number;
+  createdAt: Date;
+}
+
+interface DigitalDelivery {
+  productId: number;
+  downloadUrl: string;
+  expiresAt: Date;
+}
+
+// ============================================================================
+// FUNCTIONS
+// ============================================================================
 
 // Sample product data
-function createProduct(id, name, price, category, stock, downloadUrl) {
+function createProduct(id: number, name: string, price: number, category: ProductCategoryValue, stock?: number | null, downloadUrl?: string | null): Product {
   return {
     id,
     name,
@@ -64,7 +125,7 @@ function createProduct(id, name, price, category, stock, downloadUrl) {
 }
 
 // Sample user data
-function createUser(id, username, email, role) {
+function createUser(id: number, username: string, email: string, role?: UserRoleValue): User {
   return {
     id,
     username,
@@ -76,7 +137,7 @@ function createUser(id, username, email, role) {
 }
 
 // Create an empty cart
-function createCart(userId) {
+function createCart(userId: number): Cart {
   return {
     userId,
     items: [],
@@ -86,7 +147,7 @@ function createCart(userId) {
 }
 
 // Add item to cart
-function addToCart(cart, product, quantity) {
+function addToCart(cart: Cart, product: Product, quantity: number): Cart {
   const existingItem = cart.items.find(item => item.productId === product.id);
   
   if (existingItem) {
@@ -106,14 +167,14 @@ function addToCart(cart, product, quantity) {
 }
 
 // Calculate cart subtotal
-function calculateSubtotal(cart) {
-  return cart.items.reduce((total, item) => {
+function calculateSubtotal(cart: Cart): number {
+  return cart.items.reduce((total: number, item: CartItem) => {
     return total + (item.price * item.quantity);
   }, 0);
 }
 
 // Apply discount based on type
-function applyDiscount(amount, discountType, discountValue) {
+function applyDiscount(amount: number, discountType: DiscountType, discountValue: number): number {
   if (discountType === "PERCENTAGE") {
     return amount - (amount * discountValue / 100);
   } else if (discountType === "FIXED") {
@@ -123,20 +184,25 @@ function applyDiscount(amount, discountType, discountValue) {
 }
 
 // Calculate tax
-function calculateTax(amount, taxRate) {
+function calculateTax(amount: number, taxRate: number): number {
   return amount * (taxRate / 100);
 }
 
 // Calculate cart total with discount and tax
-function calculateTotal(cart, discountType, discountValue, taxRate) {
+function calculateTotal(cart: Cart, discountType: DiscountType, discountValue: number, taxRate?: number): number {
   const subtotal = calculateSubtotal(cart);
   const afterDiscount = applyDiscount(subtotal, discountType, discountValue);
   const tax = calculateTax(afterDiscount, taxRate || 0);
   return afterDiscount + tax;
 }
 
+// Generate a unique order ID
+function generateOrderId(): string {
+  return `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+}
+
 // Create an order from cart
-function createOrder(cart, user, shippingAddress) {
+function createOrder(cart: Cart, user: User, shippingAddress?: string | null): Order {
   return {
     id: generateOrderId(),
     userId: user.id,
@@ -150,8 +216,26 @@ function createOrder(cart, user, shippingAddress) {
   };
 }
 
+// Validate status transition
+function isValidStatusTransition(currentStatus: OrderStatusValue, newStatus: OrderStatusValue): boolean {
+  const validTransitions: Record<OrderStatusValue, OrderStatusValue[]> = {
+    [OrderStatus.PENDING]: [OrderStatus.PROCESSING, OrderStatus.CANCELLED],
+    [OrderStatus.PROCESSING]: [OrderStatus.SHIPPED, OrderStatus.CANCELLED],
+    [OrderStatus.SHIPPED]: [OrderStatus.DELIVERED],
+    [OrderStatus.DELIVERED]: [],
+    [OrderStatus.CANCELLED]: []
+  };
+  
+  return validTransitions[currentStatus]?.includes(newStatus) || false;
+}
+
+// Check if user can cancel orders
+function canCancelOrder(user: User): boolean {
+  return user.role === UserRole.ADMIN || user.role === UserRole.MODERATOR;
+}
+
 // Update order status
-function updateOrderStatus(order, newStatus, user) {
+function updateOrderStatus(order: Order, newStatus: OrderStatusValue, user: User): Order {
   if (!isValidStatusTransition(order.status, newStatus)) {
     throw new Error(`Invalid status transition from ${order.status} to ${newStatus}`);
   }
@@ -165,26 +249,8 @@ function updateOrderStatus(order, newStatus, user) {
   return order;
 }
 
-// Validate status transition
-function isValidStatusTransition(currentStatus, newStatus) {
-  const validTransitions = {
-    [OrderStatus.PENDING]: [OrderStatus.PROCESSING, OrderStatus.CANCELLED],
-    [OrderStatus.PROCESSING]: [OrderStatus.SHIPPED, OrderStatus.CANCELLED],
-    [OrderStatus.SHIPPED]: [OrderStatus.DELIVERED],
-    [OrderStatus.DELIVERED]: [],
-    [OrderStatus.CANCELLED]: []
-  };
-  
-  return validTransitions[currentStatus]?.includes(newStatus) || false;
-}
-
-// Check if user can cancel orders
-function canCancelOrder(user) {
-  return user.role === UserRole.ADMIN || user.role === UserRole.MODERATOR;
-}
-
 // Type guard to check if product is in stock
-function isInStock(product, quantity) {
+function isInStock(product: Product, quantity: number): boolean {
   if (product.category === ProductCategory.DIGITAL || product.category === ProductCategory.SUBSCRIPTION) {
     return true; // Digital and subscription products never run out
   }
@@ -192,7 +258,7 @@ function isInStock(product, quantity) {
 }
 
 // Process digital product delivery
-function processDigitalDelivery(order) {
+function processDigitalDelivery(order: Order): DigitalDelivery[] {
   const digitalItems = order.items.filter(item => 
     item.category === ProductCategory.DIGITAL
   );
@@ -204,24 +270,19 @@ function processDigitalDelivery(order) {
   }));
 }
 
-// Generate a unique order ID
-function generateOrderId() {
-  return `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
-}
-
 // Get order summary
-function getOrderSummary(order) {
+function getOrderSummary(order: Order): OrderSummary {
   return {
     orderId: order.id,
     status: order.status,
-    itemCount: order.items.reduce((sum, item) => sum + item.quantity, 0),
+    itemCount: order.items.reduce((sum: number, item: CartItem) => sum + item.quantity, 0),
     total: order.total,
     createdAt: order.createdAt
   };
 }
 
 // Validate cart before checkout
-function validateCart(cart, products) {
+function validateCart(cart: Cart, products: Product[]): boolean {
   for (const item of cart.items) {
     const product = products.find(p => p.id === item.productId);
     
