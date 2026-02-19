@@ -105,30 +105,6 @@ function addToCart(cart, product, quantity) {
   return cart;
 }
 
-// Remove item from cart
-function removeFromCart(cart, productId) {
-  cart.items = cart.items.filter(item => item.productId !== productId);
-  cart.lastModified = new Date();
-  return cart;
-}
-
-// Update item quantity
-function updateQuantity(cart, productId, newQuantity) {
-  const item = cart.items.find(item => item.productId === productId);
-  
-  if (!item) {
-    throw new Error("Product not found in cart");
-  }
-  
-  if (newQuantity <= 0) {
-    return removeFromCart(cart, productId);
-  }
-  
-  item.quantity = newQuantity;
-  cart.lastModified = new Date();
-  return cart;
-}
-
 // Calculate cart subtotal
 function calculateSubtotal(cart) {
   return cart.items.reduce((total, item) => {
@@ -207,15 +183,10 @@ function canCancelOrder(user) {
   return user.role === UserRole.ADMIN || user.role === UserRole.MODERATOR;
 }
 
-// Type guard to check if product is digital
-function isDigitalProduct(product) {
-  return product.category === ProductCategory.DIGITAL && product.downloadUrl !== null;
-}
-
 // Type guard to check if product is in stock
 function isInStock(product, quantity) {
-  if (product.category === ProductCategory.DIGITAL) {
-    return true; // Digital products never run out
+  if (product.category === ProductCategory.DIGITAL || product.category === ProductCategory.SUBSCRIPTION) {
+    return true; // Digital and subscription products never run out
   }
   return product.stock >= quantity;
 }
@@ -285,6 +256,7 @@ const admin = createUser(102, "admin", "admin@example.com", UserRole.ADMIN);
 const cart = createCart(customer.id);
 addToCart(cart, laptop, 1);
 addToCart(cart, ebook, 2);
+addToCart(cart, subscription, 1);
 console.log("Cart after adding items:", JSON.stringify(cart, null, 2));
 
 // Calculate totals
@@ -292,6 +264,9 @@ const subtotal = calculateSubtotal(cart);
 const total = calculateTotal(cart, "PERCENTAGE", 10, 8);
 console.log(`\nSubtotal: $${subtotal.toFixed(2)}`);
 console.log(`Total (with 10% discount and 8% tax): $${total.toFixed(2)}`);
+
+// Validate cart
+validateCart(cart, [laptop, ebook, subscription]);
 
 // Create and process order
 const order = createOrder(cart, customer, "123 Main St, City, Country");
