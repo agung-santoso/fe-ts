@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "test": "jest",
+    "test": "jest --verbose",
     "test:watch": "jest --watchAll --coverage --ci",
     "test:coverage": "jest --coverage"
   },

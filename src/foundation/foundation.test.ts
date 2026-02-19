@@ -18,8 +18,7 @@ describe('Foundation.ts Type Coverage Tests', () => {
       try {
         execSync('npx tsc --noEmit foundation.ts', { 
           stdio: 'pipe',
-          encoding: 'utf-8',
-          cwd: __dirname
+          encoding: 'utf-8' 
         });
       } catch (error: any) {
         const output = (error.stdout || error.stderr || '').toString();
@@ -35,8 +34,7 @@ describe('Foundation.ts Type Coverage Tests', () => {
       try {
         execSync('npx tsc --noEmit --strict foundation.ts', { 
           stdio: 'pipe',
-          encoding: 'utf-8',
-          cwd: __dirname
+          encoding: 'utf-8' 
         });
       } catch (error: any) {
         const output = (error.stdout || error.stderr || '').toString();
@@ -54,8 +52,7 @@ describe('Foundation.ts Type Coverage Tests', () => {
       try {
         execSync('npx tsc --noEmit --noImplicitAny foundation.ts', { 
           stdio: 'pipe',
-          encoding: 'utf-8',
-          cwd: __dirname
+          encoding: 'utf-8' 
         });
       } catch (error: any) {
         const output = (error.stdout || error.stderr || '').toString();
@@ -212,7 +209,7 @@ describe('Foundation.ts Type Coverage Tests', () => {
 
       // Check compilation
       try {
-        execSync('npx tsc --noEmit --strict foundation.ts', { stdio: 'pipe', encoding: 'utf-8', cwd: __dirname });
+        execSync('npx tsc --noEmit --strict foundation.ts', { stdio: 'pipe', encoding: 'utf-8' });
         report.push('✅ TypeScript Compilation: PASS');
       } catch (error: any) {
         const output = (error.stdout || error.stderr || '').toString();
@@ -223,7 +220,7 @@ describe('Foundation.ts Type Coverage Tests', () => {
 
       // Check implicit any
       try {
-        execSync('npx tsc --noEmit --noImplicitAny foundation.ts', { stdio: 'pipe', encoding: 'utf-8', cwd: __dirname });
+        execSync('npx tsc --noEmit --noImplicitAny foundation.ts', { stdio: 'pipe', encoding: 'utf-8' });
         report.push('✅ No Implicit Any: PASS');
       } catch (error: any) {
         const output = (error.stdout || error.stderr || '').toString();
