@@ -30,7 +30,7 @@ This project is designed to help you learn and practice TypeScript type annotati
 fe-ts/
 ├── src/
 │   └── foundation/
-│       ├── foundation.ts       # JavaScript code needing type annotations (EDIT THIS)
+│       ├── foundation.ts       # Typescript code needing type annotations (EDIT THIS)
 │       ├── foundation.test.ts  # Test file (READ ONLY)
 │       └── check-types.ts      # Type checking utilities (DO NOT MODIFY)
 ├── coverage/                   # Test coverage reports (generated)
@@ -40,11 +40,11 @@ fe-ts/
 ```
 
 ## Your Mission
-### 0. Create your onw branch
+### 0. Create and move to your onw branch
 
-You will edit, push in you own branch. Create MR when you ready and attach the test screenshot and coverage score in the MR description
+You will work in you own branch.
 ```
-git checkout -b 'task/my-name'
+git checkout -b 'task/your-name'
 ```
 
 ### 1. Add Type Declarations
@@ -108,58 +108,15 @@ This will:
 - Run all test cases
 - Show which tests pass/fail
 
-### 3. Check Test Coverage
+### 3. Create Merge Request
 
-To view detailed coverage:
-
-```bash
-npm run test:coverage
-```
-
-Or open the HTML coverage report:
-```bash
-# The coverage report is in: coverage/lcov-report/index.html
-# Open this file in your browser
-```
-
-### Required Type Declarations
-
-You need to add the following to `foundation.ts`:
-1. **Enums** for constants:
-   - `ProductCategory` enum (PHYSICAL, DIGITAL, SUBSCRIPTION)
-   - `OrderStatus` enum (PENDING, PROCESSING, SHIPPED, DELIVERED, CANCELLED)
-   - `UserRole` enum (CUSTOMER, ADMIN, MODERATOR)
-
-2. **Interfaces or Type Aliases** for data structures:
-   - `Product` - product information
-   - `User` - user information
-   - `Cart` - shopping cart
-   - `CartItem` - individual cart item
-   - `Order` - order information
-   - `ShippingAddress` - address information
-   - `DigitalDownload` - digital product download info
-   - `OrderSummary` - order summary information
-
-3. **Function Type Annotations**:
-   - Add parameter types to all function parameters
-   - Add return types to all functions
-   - Use proper optional parameters (`?:`) where applicable
-
-4. **Type Guards**:
-   - Add proper type predicates (`: product is DigitalProduct`) for type guard functions
-
-5. **Union Types and Literals**:
-   - Use literal types for discount types ("PERCENTAGE" | "FIXED")
-   - Use union types for nullable values (e.g., `string | null`)
-
+Create MR and attach the screenshot of test list (should be visible when you run the test). Then send the MR link to Has, Adit or Agung via Teams.
 
 ## Success Criteria
 
 Your implementation is complete when:
-1. ✅ All TypeScript errors are resolved (0 errors in `npm run type-check`)
-2. ✅ All tests pass
-3. ✅ Test coverage is at least 80%
-4. ✅ No implicit 'any' types
-5. ✅ Code logic remains unchanged (only types added)
+1. ✅ Pass 90% of the test
+3. ✅ No implicit 'any' types
+4. ✅ Code logic remains unchanged (only types added)
 
 Good luck! 🚀
