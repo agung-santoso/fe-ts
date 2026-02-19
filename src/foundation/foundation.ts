@@ -13,33 +13,27 @@
 // ============================================================================
 
 // Product categories
-const ProductCategory = {
-  PHYSICAL: "PHYSICAL",
-  DIGITAL: "DIGITAL",
-  SUBSCRIPTION: "SUBSCRIPTION"
-} as const;
-
-type ProductCategoryValue = typeof ProductCategory[keyof typeof ProductCategory];
+enum ProductCategory {
+  PHYSICAL = "PHYSICAL",
+  DIGITAL = "DIGITAL",
+  SUBSCRIPTION = "SUBSCRIPTION"
+}
 
 // Order status workflow
-const OrderStatus = {
-  PENDING: "PENDING",
-  PROCESSING: "PROCESSING",
-  SHIPPED: "SHIPPED",
-  DELIVERED: "DELIVERED",
-  CANCELLED: "CANCELLED"
-} as const;
-
-type OrderStatusValue = typeof OrderStatus[keyof typeof OrderStatus];
+enum OrderStatus {
+  PENDING = "PENDING",
+  PROCESSING = "PROCESSING",
+  SHIPPED = "SHIPPED",
+  DELIVERED = "DELIVERED",
+  CANCELLED = "CANCELLED"
+}
 
 // User roles
-const UserRole = {
-  CUSTOMER: "CUSTOMER",
-  ADMIN: "ADMIN",
-  MODERATOR: "MODERATOR"
-} as const;
-
-type UserRoleValue = typeof UserRole[keyof typeof UserRole];
+enum UserRole {
+  CUSTOMER = "CUSTOMER",
+  ADMIN = "ADMIN",
+  MODERATOR = "MODERATOR"
+}
 
 // ============================================================================
 // TYPE / INTERFACE DEFINITIONS
@@ -51,7 +45,7 @@ interface Product {
   id: number;
   name: string;
   price: number;
-  category: ProductCategoryValue;
+  category: ProductCategory;
   stock: number;
   downloadUrl: string | null;
   createdAt: Date;
@@ -62,7 +56,7 @@ interface CartItem {
   name: string;
   price: number;
   quantity: number;
-  category: ProductCategoryValue;
+  category: ProductCategory;
 }
 
 interface Cart {
@@ -76,7 +70,7 @@ interface User {
   id: number;
   username: string;
   email: string;
-  role: UserRoleValue;
+  role: UserRole;
   isActive: boolean;
   cart: CartItem[];
 }
@@ -87,7 +81,7 @@ interface Order {
   items: CartItem[];
   subtotal: number;
   total: number;
-  status: OrderStatusValue;
+  status: OrderStatus;
   shippingAddress: string | null;
   createdAt: Date;
   updatedAt: Date;
@@ -95,7 +89,7 @@ interface Order {
 
 interface OrderSummary {
   orderId: string;
-  status: OrderStatusValue;
+  status: OrderStatus;
   itemCount: number;
   total: number;
   createdAt: Date;
@@ -112,7 +106,7 @@ interface DigitalDelivery {
 // ============================================================================
 
 // Sample product data
-function createProduct(id: number, name: string, price: number, category: ProductCategoryValue, stock?: number | null, downloadUrl?: string | null): Product {
+function createProduct(id: number, name: string, price: number, category: ProductCategory, stock?: number | null, downloadUrl?: string | null): Product {
   return {
     id,
     name,
@@ -125,7 +119,7 @@ function createProduct(id: number, name: string, price: number, category: Produc
 }
 
 // Sample user data
-function createUser(id: number, username: string, email: string, role?: UserRoleValue): User {
+function createUser(id: number, username: string, email: string, role?: UserRole): User {
   return {
     id,
     username,
@@ -217,8 +211,8 @@ function createOrder(cart: Cart, user: User, shippingAddress?: string | null): O
 }
 
 // Validate status transition
-function isValidStatusTransition(currentStatus: OrderStatusValue, newStatus: OrderStatusValue): boolean {
-  const validTransitions: Record<OrderStatusValue, OrderStatusValue[]> = {
+function isValidStatusTransition(currentStatus: OrderStatus, newStatus: OrderStatus): boolean {
+  const validTransitions: Record<OrderStatus, OrderStatus[]> = {
     [OrderStatus.PENDING]: [OrderStatus.PROCESSING, OrderStatus.CANCELLED],
     [OrderStatus.PROCESSING]: [OrderStatus.SHIPPED, OrderStatus.CANCELLED],
     [OrderStatus.SHIPPED]: [OrderStatus.DELIVERED],
@@ -235,7 +229,7 @@ function canCancelOrder(user: User): boolean {
 }
 
 // Update order status
-function updateOrderStatus(order: Order, newStatus: OrderStatusValue, user: User): Order {
+function updateOrderStatus(order: Order, newStatus: OrderStatus, user: User): Order {
   if (!isValidStatusTransition(order.status, newStatus)) {
     throw new Error(`Invalid status transition from ${order.status} to ${newStatus}`);
   }
