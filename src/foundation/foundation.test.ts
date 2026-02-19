@@ -18,14 +18,15 @@ describe('Foundation.ts Type Coverage Tests', () => {
       try {
         execSync('npx tsc --noEmit foundation.ts', { 
           stdio: 'pipe',
-          encoding: 'utf-8' 
+          encoding: 'utf-8',
+          cwd: __dirname
         });
       } catch (error: any) {
-        const output = error.stdout || error.stderr || '';
+        const output = (error.stdout || error.stderr || '').toString();
         const errorCount = (output.match(/error TS/g) || []).length;
         
         if (errorCount > 0) {
-          fail(`Found ${errorCount} TypeScript compilation error(s):\n${output}`);
+          throw new Error(`Found ${errorCount} TypeScript compilation error(s):\n${output}`);
         }
       }
     });
@@ -34,14 +35,15 @@ describe('Foundation.ts Type Coverage Tests', () => {
       try {
         execSync('npx tsc --noEmit --strict foundation.ts', { 
           stdio: 'pipe',
-          encoding: 'utf-8' 
+          encoding: 'utf-8',
+          cwd: __dirname
         });
       } catch (error: any) {
-        const output = error.stdout || error.stderr || '';
+        const output = (error.stdout || error.stderr || '').toString();
         const errorCount = (output.match(/error TS/g) || []).length;
         
         if (errorCount > 0) {
-          fail(`Found ${errorCount} strict mode error(s):\n${output}`);
+          throw new Error(`Found ${errorCount} strict mode error(s):\n${output}`);
         }
       }
     });
@@ -52,15 +54,16 @@ describe('Foundation.ts Type Coverage Tests', () => {
       try {
         execSync('npx tsc --noEmit --noImplicitAny foundation.ts', { 
           stdio: 'pipe',
-          encoding: 'utf-8' 
+          encoding: 'utf-8',
+          cwd: __dirname
         });
       } catch (error: any) {
-        const output = error.stdout || error.stderr || '';
+        const output = (error.stdout || error.stderr || '').toString();
         const implicitAnyErrors = (output.match(/TS7006/g) || []).length;
         
         if (implicitAnyErrors > 0) {
           const lines = output.split('\n').filter((line: string) => line.includes('TS7006'));
-          fail(
+          throw new Error(
             `Found ${implicitAnyErrors} function(s) with implicit 'any' type:\n` +
             lines.slice(0, 10).join('\n') +
             (lines.length > 10 ? `\n... and ${lines.length - 10} more` : '')
@@ -153,8 +156,7 @@ describe('Foundation.ts Type Coverage Tests', () => {
         const match = foundationContent.match(funcRegex);
         
         if (!match) {
-          fail(`Function ${funcName} not found`);
-          return;
+          throw new Error(`Function ${funcName} not found`);
         }
 
         const funcSignature = match[0];
@@ -210,10 +212,10 @@ describe('Foundation.ts Type Coverage Tests', () => {
 
       // Check compilation
       try {
-        execSync('npx tsc --noEmit --strict foundation.ts', { stdio: 'pipe' });
+        execSync('npx tsc --noEmit --strict foundation.ts', { stdio: 'pipe', encoding: 'utf-8', cwd: __dirname });
         report.push('✅ TypeScript Compilation: PASS');
       } catch (error: any) {
-        const output = error.stdout || error.stderr || '';
+        const output = (error.stdout || error.stderr || '').toString();
         const errors = (output.match(/error TS/g) || []).length;
         totalErrors += errors;
         report.push(`❌ TypeScript Compilation: ${errors} error(s)`);
@@ -221,10 +223,10 @@ describe('Foundation.ts Type Coverage Tests', () => {
 
       // Check implicit any
       try {
-        execSync('npx tsc --noEmit --noImplicitAny foundation.ts', { stdio: 'pipe' });
+        execSync('npx tsc --noEmit --noImplicitAny foundation.ts', { stdio: 'pipe', encoding: 'utf-8', cwd: __dirname });
         report.push('✅ No Implicit Any: PASS');
       } catch (error: any) {
-        const output = error.stdout || error.stderr || '';
+        const output = (error.stdout || error.stderr || '').toString();
         const errors = (output.match(/TS7006/g) || []).length;
         totalErrors += errors;
         report.push(`❌ No Implicit Any: ${errors} error(s)`);
