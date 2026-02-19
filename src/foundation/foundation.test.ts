@@ -10,13 +10,15 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 
 describe('Foundation.ts Type Coverage Tests', () => {
-  const foundationPath = join(__dirname, 'foundation.ts');
+  const foundationDir = __dirname;
+  const foundationPath = join(foundationDir, 'foundation.ts');
   const foundationContent = readFileSync(foundationPath, 'utf-8');
 
   describe('1. TypeScript Compilation', () => {
     test('should compile without errors', () => {
       try {
         execSync('npx tsc --noEmit foundation.ts', { 
+          cwd: foundationDir,
           stdio: 'pipe',
           encoding: 'utf-8' 
         });
@@ -33,6 +35,7 @@ describe('Foundation.ts Type Coverage Tests', () => {
     test('should compile with strict mode enabled', () => {
       try {
         execSync('npx tsc --noEmit --strict foundation.ts', { 
+          cwd: foundationDir,
           stdio: 'pipe',
           encoding: 'utf-8' 
         });
@@ -51,6 +54,7 @@ describe('Foundation.ts Type Coverage Tests', () => {
     test('should not have implicit "any" parameters', () => {
       try {
         execSync('npx tsc --noEmit --noImplicitAny foundation.ts', { 
+          cwd: foundationDir,
           stdio: 'pipe',
           encoding: 'utf-8' 
         });
@@ -195,55 +199,6 @@ describe('Foundation.ts Type Coverage Tests', () => {
       
       // Allow up to 2 uses of 'any' (some edge cases might be valid)
       expect(anyMatches.length).toBeLessThanOrEqual(2);
-    });
-  });
-
-  describe('7. Type Coverage Summary', () => {
-    test('should generate type coverage report', () => {
-      let totalErrors = 0;
-      const report: string[] = [];
-
-      report.push('\n╔════════════════════════════════════════════════════════════════╗');
-      report.push('║           TypeScript Type Coverage Report                     ║');
-      report.push('╚════════════════════════════════════════════════════════════════╝\n');
-
-      // Check compilation
-      try {
-        execSync('npx tsc --noEmit --strict foundation.ts', { stdio: 'pipe', encoding: 'utf-8' });
-        report.push('✅ TypeScript Compilation: PASS');
-      } catch (error: any) {
-        const output = (error.stdout || error.stderr || '').toString();
-        const errors = (output.match(/error TS/g) || []).length;
-        totalErrors += errors;
-        report.push(`❌ TypeScript Compilation: ${errors} error(s)`);
-      }
-
-      // Check implicit any
-      try {
-        execSync('npx tsc --noEmit --noImplicitAny foundation.ts', { stdio: 'pipe', encoding: 'utf-8' });
-        report.push('✅ No Implicit Any: PASS');
-      } catch (error: any) {
-        const output = (error.stdout || error.stderr || '').toString();
-        const errors = (output.match(/TS7006/g) || []).length;
-        totalErrors += errors;
-        report.push(`❌ No Implicit Any: ${errors} error(s)`);
-      }
-
-      // Count enums
-      const enumCount = (foundationContent.match(/enum\s+\w+/g) || []).length;
-      report.push(`\n📊 Statistics:`);
-      report.push(`   - Enums defined: ${enumCount}/3 expected`);
-      
-      // Count interfaces/types
-      const typeCount = (foundationContent.match(/(type|interface)\s+\w+/g) || []).length;
-      report.push(`   - Types/Interfaces: ${typeCount}`);
-
-      report.push(`\n${totalErrors === 0 ? '✅ ALL TESTS PASSED!' : `❌ ${totalErrors} total error(s) found`}`);
-      report.push('════════════════════════════════════════════════════════════════\n');
-
-      console.log(report.join('\n'));
-
-      expect(totalErrors).toBe(0);
     });
   });
 });
